@@ -13,6 +13,7 @@ import { extend, mergeOptions, formatComponentName } from '../util/index'
 let uid = 0
 
 export function initMixin (Vue: Class<Component>) {
+  //new vue初始化函数
   Vue.prototype._init = function (options?: Object) {
     const vm: Component = this
     // a uid
@@ -29,6 +30,7 @@ export function initMixin (Vue: Class<Component>) {
     // a flag to avoid this being observed
     vm._isVue = true
     // merge options
+    //合并选项（默认选项和用户传入选项）
     if (options && options._isComponent) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
@@ -49,13 +51,14 @@ export function initMixin (Vue: Class<Component>) {
     }
     // expose real self
     vm._self = vm
-    initLifecycle(vm)
-    initEvents(vm)
-    initRender(vm)
+    initLifecycle(vm) // 初始化生命周期（常用属性初始化）  $parent,$root,$children,$refs
+    initEvents(vm)// 添加监听父组件传递的事件和回调，事件谁派发谁监听
+    initRender(vm) //渲染相关 render函数 $slots,$scopedSlots,_c,$createElement
     callHook(vm, 'beforeCreate')
-    initInjections(vm) // resolve injections before data/props
-    initState(vm)
-    initProvide(vm) // resolve provide after data/props
+    initInjections(vm) // 获取注入的数据
+    initState(vm)// 数据初始化和响应式处理 
+    initProvide(vm) // 提供数据
+    // （为什么先注入在提供？ 注入的数据不会做响应式处理，祖辈数据传入之后在当前组件代理挂载之前要做一下判重，后面还要提供给子代）
     callHook(vm, 'created')
 
     /* istanbul ignore if */
@@ -66,6 +69,7 @@ export function initMixin (Vue: Class<Component>) {
     }
 
     if (vm.$options.el) {
+      //有el选项是帮你挂载$mount
       vm.$mount(vm.$options.el)
     }
   }

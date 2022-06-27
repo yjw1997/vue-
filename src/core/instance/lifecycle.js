@@ -40,7 +40,7 @@ export function initLifecycle (vm: Component) {
     }
     parent.$children.push(vm)
   }
-
+//组件创建至上而下，挂载顺序至下而上
   vm.$parent = parent
   vm.$root = parent ? parent.$root : vm
 
@@ -138,6 +138,8 @@ export function lifecycleMixin (Vue: Class<Component>) {
   }
 }
 
+
+//初始化$mount肚子里执行
 export function mountComponent (
   vm: Component,
   el: ?Element,
@@ -186,6 +188,7 @@ export function mountComponent (
       measure(`vue ${name} patch`, startTag, endTag)
     }
   } else {
+    //  用户$mount时定义了updateComponent，初始化和用户数据更新时执行
     updateComponent = () => {
       vm._update(vm._render(), hydrating)
     }
@@ -194,6 +197,8 @@ export function mountComponent (
   // we set this to vm._watcher inside the watcher's constructor
   // since the watcher's initial patch may call $forceUpdate (e.g. inside child
   // component's mounted hook), which relies on vm._watcher being already defined
+  //定义观察者一个组件一个观察者
+
   new Watcher(vm, updateComponent, noop, {
     before () {
       if (vm._isMounted && !vm._isDestroyed) {

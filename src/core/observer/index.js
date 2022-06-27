@@ -34,6 +34,7 @@ export function toggleObserving (value: boolean) {
  * object's property keys into getter/setters that
  * collect dependencies and dispatch updates.
  */
+//每一个响应式对象都有一个ob
 export class Observer {
   value: any;
   dep: Dep;
@@ -41,17 +42,26 @@ export class Observer {
 
   constructor (value: any) {
     this.value = value
+    //为什么在Observer里面要声明dep？
+    //object里面有新增或者删除属性
+    //array中有变更方法
     this.dep = new Dep()
     this.vmCount = 0
+    //设置__ob__属性引用当前observer实例
     def(value, '__ob__', this)
+    //判断类型
     if (Array.isArray(value)) {
       if (hasProto) {
+        //替换数组对象原型
         protoAugment(value, arrayMethods)
       } else {
+        // 没有原型的奇葩就做一些强硬操作
         copyAugment(value, arrayMethods, arrayKeys)
       }
+        //如果数组里面元素是对象还需要做响应式处理
       this.observeArray(value)
     } else {
+      //对象直接做处理
       this.walk(value)
     }
   }
@@ -111,6 +121,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   if (!isObject(value) || value instanceof VNode) {
     return
   }
+  //获取观察者：已经存在直接返回否则创建新的实例
   let ob: Observer | void
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
     ob = value.__ob__

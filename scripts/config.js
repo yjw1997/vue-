@@ -36,6 +36,7 @@ const resolve = p => {
 }
 
 const builds = {
+  // src/platforms/web
   // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
   'web-runtime-cjs-dev': {
     entry: resolve('web/entry-runtime.js'),

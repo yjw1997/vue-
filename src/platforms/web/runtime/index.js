@@ -31,14 +31,17 @@ extend(Vue.options.directives, platformDirectives)
 extend(Vue.options.components, platformComponents)
 
 // install platform patch function
+//  指定补丁方法，把传人的虚拟dom转换为真实dom diff算法发生地方(初始化赋值和之后的更新)
 Vue.prototype.__patch__ = inBrowser ? patch : noop
 
 // public mount method
+//实现mount方法
 Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
 ): Component {
   el = el && inBrowser ? query(el) : undefined
+  //初始化，将首次渲染结构替换el
   return mountComponent(this, el, hydrating)
 }
 
