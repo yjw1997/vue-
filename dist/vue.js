@@ -3966,9 +3966,11 @@
       // based on the rendering backend used.
       if (!prevVnode) {
         // initial render
+        //初始化渲染
         vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */);
       } else {
         // updates
+        // 数据更新 diff算法
         vm.$el = vm.__patch__(prevVnode, vnode);
       }
       restoreActiveInstance();
@@ -5124,7 +5126,7 @@
   initMixin(Vue); //混入实现——init方法
   stateMixin(Vue);// 状态相关api $+,$props,$set,$delete,$watch
   eventsMixin(Vue);// 事件相关api $on,$once,$off,$emit
-  lifecycleMixin(Vue);// 生命周期api _update,$forceUpdate,$destroy
+  lifecycleMixin(Vue);// 生命周期api _update,$forceUpdate,$destroy，mountComponent
   renderMixin(Vue);// 渲染api _render,$nextTick
 
   /*  */

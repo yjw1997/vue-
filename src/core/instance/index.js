@@ -19,7 +19,7 @@ function Vue (options) {
 initMixin(Vue) //混入实现——init方法
 stateMixin(Vue)// 状态相关api $+,$props,$set,$delete,$watch
 eventsMixin(Vue)// 事件相关api $on,$once,$off,$emit
-lifecycleMixin(Vue)// 生命周期api _update,$forceUpdate,$destroy
+lifecycleMixin(Vue)// 生命周期api _update,$forceUpdate,$destroy，mountComponent
 renderMixin(Vue)// 渲染api _render,$nextTick
 
 export default Vue
