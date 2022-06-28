@@ -121,6 +121,7 @@ const builds = {
     banner
   },
   // Runtime+compiler development build (Browser)
+  // src/platforms/web
   'web-full-dev': {
     entry: resolve('web/entry-runtime-with-compiler.js'),
     dest: resolve('dist/vue.js'),

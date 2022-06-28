@@ -162,8 +162,10 @@ export default class Watcher {
    * Subscriber interface.
    * Will be called when a dependency changes.
    */
+  // dep 调用watch执行update
   update () {
     /* istanbul ignore else */
+    //配置项 lazy sync
     if (this.lazy) {
       this.dirty = true
     } else if (this.sync) {

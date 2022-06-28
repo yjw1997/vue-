@@ -15,6 +15,7 @@ function flushCallbacks () {
   const copies = callbacks.slice(0)
   callbacks.length = 0
   for (let i = 0; i < copies.length; i++) {
+    //  执行回调函数
     copies[i]()
   }
 }
