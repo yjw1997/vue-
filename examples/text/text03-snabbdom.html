@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>使用snabbdom</head>
+
+<body>
+  <div id="app"></div>
+  <!--安装并引入snabbdom-->
+  <!--vue基于snabbdom实现虚拟dom-->
+  <script src="./snabbdom.js"></script>
+  <script>
+    const obj = {}
+    //1.获取patch函数对比两个虚拟dom，执行dom操作
+    const { h, init } = snabbdom
+    const patch = init([])
+    // 保存旧的vnode
+    let vnode;
+    function defineReactive(obj, key, val) {
+      Object.defineProperty(obj, key, {
+        get() {
+          return val
+        },
+        set(newVal) {
+          if (newVal !== val) {
+            val = newVal
+            update()
+          }
+        }
+      })
+    }
+
+    // 更新 
+    function update() {
+      // 修改为patch方式做更新，避免了直接接触dom 
+      vnode = patch(vnode, h('div#app', obj.foo))
+    }
+    defineReactive(obj, 'foo', new Date().toLocaleTimeString())
+    // 初始化 
+    vnode = patch(app, h('div#app', obj.foo))
+    console.log(vnode); setInterval(() => { obj.foo = new Date().toLocaleTimeString() }, 1000);
+  </script>
+</body>
+
+</html>
