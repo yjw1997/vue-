@@ -1934,6 +1934,7 @@
     var copies = callbacks.slice(0);
     callbacks.length = 0;
     for (var i = 0; i < copies.length; i++) {
+      //  执行回调函数
       copies[i]();
     }
   }
@@ -2006,6 +2007,7 @@
 
   function nextTick (cb, ctx) {
     var _resolve;
+    //  在调用栈传入回调函数
     callbacks.push(function () {
       if (cb) {
         try {
@@ -3517,12 +3519,15 @@
     var options = vm.$options;
     var parentVnode = vm.$vnode = options._parentVnode; // the placeholder node in parent tree
     var renderContext = parentVnode && parentVnode.context;
+
+    // 插槽相关初始化
     vm.$slots = resolveSlots(options._renderChildren, renderContext);
     vm.$scopedSlots = emptyObject;
     // bind the createElement fn to this instance
     // so that we get proper render context inside it.
     // args order: tag, data, children, normalizationType, alwaysNormalize
     // internal version is used by render functions compiled from templates
+    //  h函数初始化
     vm._c = function (a, b, c, d) { return createElement(vm, a, b, c, d, false); };
     // normalization is always applied for the public version, used in
     // user-written render functions.
@@ -3555,6 +3560,7 @@
 
     Vue.prototype._render = function () {
       var vm = this;
+      //  在选项中拿出render函数
       var ref = vm.$options;
       var render = ref.render;
       var _parentVnode = ref._parentVnode;
@@ -3577,6 +3583,7 @@
         // separately from one another. Nested component's render fns are called
         // when parent component is patched.
         currentRenderingInstance = vm;
+        //执行render获取vnode
         vnode = render.call(vm._renderProxy, vm.$createElement);
       } catch (e) {
         handleError(e, vm, "render");
@@ -3930,8 +3937,8 @@
   }
 
   function initLifecycle (vm) {
+    //  常用生命周期变量初始化
     var options = vm.$options;
-
     // locate first non-abstract parent
     var parent = options.parent;
     if (parent && !options.abstract) {
@@ -3959,6 +3966,7 @@
     Vue.prototype._update = function (vnode, hydrating) {
       var vm = this;
       var prevEl = vm.$el;
+      // 上一次是否有虚拟dom
       var prevVnode = vm._vnode;
       var restoreActiveInstance = setActiveInstance(vm);
       vm._vnode = vnode;
@@ -4432,7 +4440,8 @@
           flushSchedulerQueue();
           return
         }
-        //异步执行队列
+        
+        //异步刷新队列
         nextTick(flushSchedulerQueue);
       }
     }
@@ -4567,8 +4576,10 @@
    * Subscriber interface.
    * Will be called when a dependency changes.
    */
+  // dep 调用watch执行update
   Watcher.prototype.update = function update () {
     /* istanbul ignore else */
+    //配置项 lazy sync
     if (this.lazy) {
       this.dirty = true;
     } else if (this.sync) {
@@ -4667,8 +4678,10 @@
   function initState (vm) {
     vm._watchers = [];
     var opts = vm.$options;
+    //属性初始化
     if (opts.props) { initProps(vm, opts.props); }
     if (opts.methods) { initMethods(vm, opts.methods); }
+    //数据响应式
     if (opts.data) {
       initData(vm);
     } else {
@@ -5493,11 +5506,10 @@
     Vue.options._base = Vue;
 
     extend(Vue.options.components, builtInComponents);
-
-    initUse(Vue);
-    initMixin$1(Vue);
-    initExtend(Vue);
-    initAssetRegisters(Vue);
+    initUse(Vue);  //实现use
+    initMixin$1(Vue);  //实现mixin
+    initExtend(Vue);  //  实现Vue.extend函数
+    initAssetRegisters(Vue); //  注册实现Vue.component/directive/filter
   }
 
   //定义全局的api
@@ -5925,10 +5937,11 @@
 
     var modules = backend.modules;
     var nodeOps = backend.nodeOps;
-
+    // 循环modules
     for (i = 0; i < hooks.length; ++i) {
       cbs[hooks[i]] = [];
       for (j = 0; j < modules.length; ++j) {
+        // 如果存在对应的钩子函数
         if (isDef(modules[j][hooks[i]])) {
           cbs[hooks[i]].push(modules[j][hooks[i]]);
         }
@@ -6235,12 +6248,14 @@
         removeNode(vnode.elm);
       }
     }
-
+  // 重排算法
     function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
+      //四个指针
       var oldStartIdx = 0;
       var newStartIdx = 0;
       var oldEndIdx = oldCh.length - 1;
       var oldStartVnode = oldCh[0];
+      //四个节点
       var oldEndVnode = oldCh[oldEndIdx];
       var newEndIdx = newCh.length - 1;
       var newStartVnode = newCh[0];
@@ -6255,44 +6270,56 @@
       {
         checkDuplicateKeys(newCh);
       }
-
+      //循环条件 开始索引不能大于结束索引
       while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+        //  头尾指针调整
         if (isUndef(oldStartVnode)) {
           oldStartVnode = oldCh[++oldStartIdx]; // Vnode has been moved left
         } else if (isUndef(oldEndVnode)) {
           oldEndVnode = oldCh[--oldEndIdx];
         } else if (sameVnode(oldStartVnode, newStartVnode)) {
+        //两个开头相同
           patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);
           oldStartVnode = oldCh[++oldStartIdx];
           newStartVnode = newCh[++newStartIdx];
         } else if (sameVnode(oldEndVnode, newEndVnode)) {
+          //两个结尾相同
           patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue, newCh, newEndIdx);
           oldEndVnode = oldCh[--oldEndIdx];
           newEndVnode = newCh[--newEndIdx];
         } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
+          // 老的开始和新的结束  除了打补丁还要移动到队尾 insertBefore
           patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue, newCh, newEndIdx);
           canMove && nodeOps.insertBefore(parentElm, oldStartVnode.elm, nodeOps.nextSibling(oldEndVnode.elm));
           oldStartVnode = oldCh[++oldStartIdx];
           newEndVnode = newCh[--newEndIdx];
         } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
+          // 老的结束和新的开始 除了打补丁还要移动到队首 insertBefore
           patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);
           canMove && nodeOps.insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
           oldEndVnode = oldCh[--oldEndIdx];
           newStartVnode = newCh[++newStartIdx];
         } else {
+          //四种猜想之后都没有找到相同的 不得不开始循环查找  findIdxInOld
           if (isUndef(oldKeyToIdx)) { oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx); }
+          //  查找在老数组中的索引
           idxInOld = isDef(newStartVnode.key)
             ? oldKeyToIdx[newStartVnode.key]
             : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx);
           if (isUndef(idxInOld)) { // New element
+            //没找到创建
             createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx);
           } else {
+            //找到除了打补丁还要移动到队首
             vnodeToMove = oldCh[idxInOld];
+            // 如果节点相同不是同一个节点
             if (sameVnode(vnodeToMove, newStartVnode)) {
+              //  找到了创建追加
               patchVnode(vnodeToMove, newStartVnode, insertedVnodeQueue, newCh, newStartIdx);
               oldCh[idxInOld] = undefined;
               canMove && nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm);
             } else {
+              //  如果节点相同不是同一个节点，创建
               // same key but different element. treat as new element
               createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx);
             }
@@ -6300,6 +6327,7 @@
           newStartVnode = newCh[++newStartIdx];
         }
       }
+      //整理工作 ：必定有数组剩下的元素未处理
       if (oldStartIdx > oldEndIdx) {
         refElm = isUndef(newCh[newEndIdx + 1]) ? null : newCh[newEndIdx + 1].elm;
         addVnodes(parentElm, refElm, newCh, newStartIdx, newEndIdx, insertedVnodeQueue);
@@ -6332,7 +6360,7 @@
         if (isDef(c) && sameVnode(node, c)) { return i }
       }
     }
-
+  // diff算法
     function patchVnode (
       oldVnode,
       vnode,
@@ -6351,7 +6379,7 @@
       }
 
       var elm = vnode.elm = oldVnode.elm;
-
+      // 优化行为  节点是占位符
       if (isTrue(oldVnode.isAsyncPlaceholder)) {
         if (isDef(vnode.asyncFactory.resolved)) {
           hydrate(oldVnode.elm, vnode, insertedVnodeQueue);
@@ -6365,6 +6393,7 @@
       // note we only do this if the vnode is cloned -
       // if the new node is not cloned it means the render functions have been
       // reset by the hot-reload-api and we need to do a proper re-render.
+      // 优化行为  节点是静态节点
       if (isTrue(vnode.isStatic) &&
         isTrue(oldVnode.isStatic) &&
         vnode.key === oldVnode.key &&
@@ -6374,33 +6403,46 @@
         return
       }
 
+      //  执行一些组件的钩子
       var i;
       var data = vnode.data;
       if (isDef(data) && isDef(i = data.hook) && isDef(i = i.prepatch)) {
         i(oldVnode, vnode);
       }
-
+      //查找新旧节点是否有孩子
       var oldCh = oldVnode.children;
       var ch = vnode.children;
+      // 属性更新
       if (isDef(data) && isPatchable(vnode)) {
         for (i = 0; i < cbs.update.length; ++i) { cbs.update[i](oldVnode, vnode); }
         if (isDef(i = data.hook) && isDef(i = i.update)) { i(oldVnode, vnode); }
       }
+      //判断是否是元素
       if (isUndef(vnode.text)) {
+        //  双方都有孩子
         if (isDef(oldCh) && isDef(ch)) {
+          //比孩子，重排操作reorder
           if (oldCh !== ch) { updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly); }
+          // 老节点没有子节点而新节点有子节点
         } else if (isDef(ch)) {
           {
             checkDuplicateKeys(ch);
           }
+          // 清空老节点文本
           if (isDef(oldVnode.text)) { nodeOps.setTextContent(elm, ''); }
+          //新增子节点
           addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue);
+          // 新节点没有子节点而老节点有子节点
         } else if (isDef(oldCh)) {
+          // 移除该节点的所有子节点
           removeVnodes(oldCh, 0, oldCh.length - 1);
+          //老节点存在文本，清空操作
         } else if (isDef(oldVnode.text)) {
+          //文本替换
           nodeOps.setTextContent(elm, '');
         }
       } else if (oldVnode.text !== vnode.text) {
+        // 双方都是文本节点，更新文本
         nodeOps.setTextContent(elm, vnode.text);
       }
       if (isDef(data)) {
@@ -6533,8 +6575,11 @@
         return node.nodeType === (vnode.isComment ? 8 : 3)
       }
     }
-
+    // hydrating 服务端渲染（激活）
+    //为什么返回一个patch
     return function patch (oldVnode, vnode, hydrating, removeOnly) {
+
+    //  传进来虚拟dom是否不存在，不存在做删除操作
       if (isUndef(vnode)) {
         if (isDef(oldVnode)) { invokeDestroyHook(oldVnode); }
         return
@@ -6542,17 +6587,22 @@
 
       var isInitialPatch = false;
       var insertedVnodeQueue = [];
-
+  //  判断老节点是否存在
       if (isUndef(oldVnode)) {
         // empty mount (likely as component), create new root element
         isInitialPatch = true;
+        //  直接创建
         createElm(vnode, insertedVnodeQueue);
       } else {
+        //是否传入真实的元素，则是初始化操作
         var isRealElement = isDef(oldVnode.nodeType);
         if (!isRealElement && sameVnode(oldVnode, vnode)) {
           // patch existing root node
+          //两个虚拟dom相等向下递归
           patchVnode(oldVnode, vnode, insertedVnodeQueue, null, null, removeOnly);
         } else {
+          //初始化过程，创建新的dom树，追加到body，删除宿主元素
+          //  存在真实节点
           if (isRealElement) {
             // mounting to a real element
             // check if this is server-rendered content and if we can perform
@@ -6577,14 +6627,18 @@
             }
             // either not server-rendered, or hydration failed.
             // create an empty node and replace it
+            //  创建一个空的虚拟dom把oldVnode代替一下
             oldVnode = emptyNodeAt(oldVnode);
           }
 
           // replacing existing element
+          //  获取真实节点
           var oldElm = oldVnode.elm;
+        // 找爸爸
           var parentElm = nodeOps.parentNode(oldElm);
 
           // create new node
+          //做追加操作
           createElm(
             vnode,
             insertedVnodeQueue,
@@ -6626,7 +6680,9 @@
           }
 
           // destroy old node
+          // 是否存在老爹
           if (isDef(parentElm)) {
+            // 删除老节点
             removeVnodes([oldVnode], 0, 0);
           } else if (isDef(oldVnode.tag)) {
             invokeDestroyHook(oldVnode);
@@ -8528,6 +8584,7 @@
   // built-in modules have been applied.
   var modules = platformModules.concat(baseModules);
 
+  //传递平台特有的节点操作选项给工厂函数 返回patch
   var patch = createPatchFunction({ nodeOps: nodeOps, modules: modules });
 
   /**
@@ -9112,6 +9169,7 @@
   Vue.config.isUnknownElement = isUnknownElement;
 
   // install platform runtime directives & components
+  //  安装web平台指令和组件
   extend(Vue.options.directives, platformDirectives);
   extend(Vue.options.components, platformComponents);
 
@@ -12023,7 +12081,7 @@
         if ( config.performance && mark) {
           mark('compile');
         }
-
+        //得到render
         var ref = compileToFunctions(template, {
           outputSourceRange: "development" !== 'production',
           shouldDecodeNewlines: shouldDecodeNewlines,
@@ -12043,6 +12101,7 @@
         }
       }
     }
+    // 执行挂载
     return mount.call(this, el, hydrating)
   };
 

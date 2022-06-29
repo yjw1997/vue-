@@ -30,8 +30,8 @@ export function setActiveInstance(vm: Component) {
 }
 
 export function initLifecycle (vm: Component) {
+  //  常用生命周期变量初始化
   const options = vm.$options
-
   // locate first non-abstract parent
   let parent = options.parent
   if (parent && !options.abstract) {
@@ -59,6 +59,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     const prevEl = vm.$el
+    // 上一次是否有虚拟dom
     const prevVnode = vm._vnode
     const restoreActiveInstance = setActiveInstance(vm)
     vm._vnode = vnode

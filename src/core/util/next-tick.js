@@ -88,6 +88,7 @@ if (typeof Promise !== 'undefined' && isNative(Promise)) {
 
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
+  //  在调用栈传入回调函数
   callbacks.push(() => {
     if (cb) {
       try {

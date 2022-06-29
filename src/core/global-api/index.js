@@ -46,7 +46,7 @@ export function initGlobalAPI (Vue: GlobalAPI) {
   Vue.nextTick = nextTick
 
   // 2.6 explicit observable API
-  Vue.observable = <>(obj: T): T => {
+  Vue.observable = (obj: T): T => {
     observe(obj)
     return obj
   }
@@ -61,9 +61,8 @@ export function initGlobalAPI (Vue: GlobalAPI) {
   Vue.options._base = Vue
 
   extend(Vue.options.components, builtInComponents)
-  </>
-  initUse(Vue)  //实现use</>
-  initMixin(Vue)  //实现mixin</>
-  initExtend(Vue)  //  实现Vue.extend函数</>
+  initUse(Vue)  //实现use
+  initMixin(Vue)  //实现mixin
+  initExtend(Vue)  //  实现Vue.extend函数
   initAssetRegisters(Vue) //  注册实现Vue.component/directive/filter
 }
